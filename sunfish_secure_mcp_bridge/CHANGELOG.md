@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- Use Home Assistant's maintained default protected AppArmor profile.
+- Remove the custom profile that blocked interpreted s6 bootstrap launchers.
+
 ## 0.1.1
 
 - Allow the Home Assistant base image shell to read its `/init` launcher.
