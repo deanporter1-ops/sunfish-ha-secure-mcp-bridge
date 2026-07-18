@@ -1,5 +1,5 @@
 name: Sunfish Secure MCP Bridge
-version: "0.1.3"
+version: "0.1.4"
 slug: sunfish_secure_mcp_bridge
 description: OpenAI Secure MCP Tunnel with a server-side Home Assistant tool policy
 url: https://github.com/deanporter1-ops/sunfish-ha-secure-mcp-bridge

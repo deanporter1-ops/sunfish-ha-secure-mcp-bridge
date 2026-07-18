@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4
+
+- Return a clean not-configured response for OAuth discovery paths instead of forwarding them to HA-MCP.
+
 ## 0.1.3
 
 - Override the base image entrypoint so the bridge starts directly without invoking s6-overlay `/init`.

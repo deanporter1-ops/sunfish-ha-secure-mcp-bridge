@@ -398,6 +398,15 @@ class ProxyHandler(BaseHTTPRequestHandler):
         return
 
     def do_GET(self) -> None:
+        if urlsplit(self.path).path.startswith("/.well-known/"):
+            payload = b"{}"
+            self.send_response(404)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+            return
         self.forward()
 
     def do_POST(self) -> None:
