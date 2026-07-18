@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Override the base image entrypoint so the bridge starts directly without invoking s6-overlay `/init`.
+
 ## 0.1.2
 
 - Use Home Assistant's maintained default protected AppArmor profile.

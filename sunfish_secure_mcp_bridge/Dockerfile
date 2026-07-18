@@ -28,4 +28,4 @@ RUN apk add --no-cache python3 ca-certificates \
 
 COPY bridge.py /opt/sunfish/bridge.py
 
-CMD ["python3", "/opt/sunfish/bridge.py"]
+ENTRYPOINT ["python3", "/opt/sunfish/bridge.py"]
