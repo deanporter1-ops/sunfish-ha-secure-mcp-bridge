@@ -9,7 +9,7 @@ profile sunfish_secure_mcp_bridge flags=(attach_disconnected,mediate_deleted) {
   network inet stream,
   network inet6 stream,
 
-  /init ix,
+  /init rix,
   /bin/** ix,
   /usr/bin/** ix,
   /run/{s6,s6-rc*,service}/** ix,
