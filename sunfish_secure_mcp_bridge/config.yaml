@@ -1,0 +1,32 @@
+name: Sunfish Secure MCP Bridge
+version: "0.1.0"
+slug: sunfish_secure_mcp_bridge
+description: OpenAI Secure MCP Tunnel with a server-side Home Assistant tool policy
+url: https://github.com/deanporter1-ops/sunfish-ha-secure-mcp-bridge
+arch:
+  - amd64
+startup: application
+boot: auto
+init: false
+ingress: false
+host_network: false
+hassio_api: false
+homeassistant_api: false
+docker_api: false
+full_access: false
+apparmor: true
+tmpfs: true
+backup: cold
+ports: {}
+watchdog: http://[HOST]:8790/healthz
+options:
+  tunnel_id: null
+  runtime_api_key: null
+  upstream_url: null
+  log_level: info
+schema:
+  tunnel_id: "match(^tunnel_[A-Za-z0-9_-]+$)"
+  runtime_api_key: password
+  upstream_url: password
+  log_level: "list(info|warn)"
+
