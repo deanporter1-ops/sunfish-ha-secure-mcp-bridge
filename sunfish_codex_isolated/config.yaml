@@ -1,0 +1,37 @@
+name: Sunfish Codex Isolated
+version: "0.1.0"
+stage: experimental
+slug: sunfish_codex_isolated
+description: Isolated Codex workspace with ingress-only terminal and read-only HA MCP relay.
+arch:
+  - amd64
+startup: application
+boot: manual
+init: false
+ingress: true
+ingress_port: 8099
+ingress_stream: true
+panel_icon: mdi:robot-outline
+panel_title: Codex (isolated)
+panel_admin: true
+ports: {}
+map: []
+hassio_api: false
+homeassistant_api: false
+auth_api: false
+docker_api: false
+host_network: false
+host_pid: false
+host_ipc: false
+host_dbus: false
+host_uts: false
+full_access: false
+privileged: []
+devices: []
+apparmor: true
+options:
+  allowed_user_id: ""
+  mcp_url: ""
+schema:
+  allowed_user_id: str
+  mcp_url: password

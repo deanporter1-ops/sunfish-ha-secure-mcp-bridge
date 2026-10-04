@@ -1,0 +1,13 @@
+#!/bin/bash
+set -euo pipefail
+umask 077
+cd /data/workspace
+printf 'Sunfish isolated Codex. HA access is read-only; this workspace is not HA configuration.\n'
+if ! /usr/local/bin/codex login status >/dev/null 2>&1; then
+    printf 'Not signed in. No login has been started.\n'
+    printf 'When ready, personally run: codex login --device-auth\n'
+    printf 'Keep the one-time code private. Then run: codex-session\n'
+    # Opening/visually verifying the terminal must not create an auth code.
+    exec /bin/bash --noprofile --norc
+fi
+exec /usr/local/bin/codex --ask-for-approval on-request --sandbox workspace-write
