@@ -102,6 +102,18 @@ def run_check(label, command, environment, runner=subprocess.run, version=False)
             print("Readiness failure category: PERMISSION_DENIED", flush=True)
         elif b"unrecognized" in raw_error or b"unexpected argument" in raw_error:
             print("Readiness failure category: CLI_ARGUMENT_REJECTED", flush=True)
+        elif b"map_hash" in raw_error:
+            print("Readiness failure category: NGINX_MAP_HASH_SIZE", flush=True)
+        elif b"unknown directive" in raw_error:
+            print("Readiness failure category: NGINX_UNKNOWN_DIRECTIVE", flush=True)
+        elif b"getpwnam" in raw_error:
+            print("Readiness failure category: NGINX_USER_LOOKUP", flush=True)
+        elif b"No such file or directory" in raw_error:
+            print("Readiness failure category: MISSING_RUNTIME_PATH", flush=True)
+        elif b"unexpected" in raw_error or b"invalid" in raw_error:
+            print("Readiness failure category: CONFIGURATION_SYNTAX", flush=True)
+        else:
+            print("Readiness failure category: UNSPECIFIED_NONZERO_EXIT", flush=True)
         raise ReadinessError("Isolated Codex compatibility check failed")
 
 

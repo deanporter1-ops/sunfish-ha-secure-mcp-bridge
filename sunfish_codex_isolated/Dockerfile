@@ -1,6 +1,6 @@
 FROM ghcr.io/home-assistant/amd64-base@sha256:322c4492f25f9c2ca04b0789101a44350c516f4d3cd928fca14847ef19668ede
 
-ARG BUILD_VERSION="0.1.0"
+ARG BUILD_VERSION="0.1.1"
 LABEL io.hass.version="${BUILD_VERSION}" io.hass.type="app" io.hass.arch="amd64"
 
 # Signed Alpine v3.23 packages, direct versions pinned. Transitive packages are

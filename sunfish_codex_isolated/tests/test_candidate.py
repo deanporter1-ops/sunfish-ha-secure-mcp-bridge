@@ -75,7 +75,25 @@ class ReadinessTests(unittest.TestCase):
             return SimpleNamespace(returncode=1, stdout=b"secret must not be printed")
         with patch("builtins.print") as output, self.assertRaises(ReadinessError):
             run_check("test", ["ignored"], {"HOME": "/safe"}, runner=fail)
-        self.assertEqual(output.call_args.args[0], "Readiness test: FAIL")
+        self.assertEqual(output.call_args_list[0].args[0], "Readiness test: FAIL")
+        self.assertEqual(output.call_args.args[0], "Readiness failure category: UNSPECIFIED_NONZERO_EXIT")
+
+    def test_diagnostic_categories_do_not_emit_process_stderr(self):
+        cases = {
+            b"could not build map_hash": "NGINX_MAP_HASH_SIZE",
+            b"unknown directive": "NGINX_UNKNOWN_DIRECTIVE",
+            b"getpwnam failed": "NGINX_USER_LOOKUP",
+            b"No such file or directory": "MISSING_RUNTIME_PATH",
+            b"invalid configuration": "CONFIGURATION_SYNTAX",
+            b"Operation not permitted": "OPERATION_NOT_PERMITTED",
+        }
+        for message, category in cases.items():
+            with self.subTest(category=category):
+                runner = lambda *_a, **_k: SimpleNamespace(returncode=1, stdout=b"", stderr=message + b" private-secret")
+                with patch("builtins.print") as output, self.assertRaises(ReadinessError):
+                    run_check("test", ["ignored"], {}, runner=runner)
+                self.assertEqual(output.call_args.args[0], "Readiness failure category: " + category)
+                self.assertNotIn("private-secret", str(output.call_args_list))
 
     def test_version_must_match_pinned_release(self):
         for version, success in ((b"codex-cli 0.160.0\n", True), (b"codex-cli 0.159.0\n", False)):
