@@ -1,0 +1,9 @@
+#!/bin/bash
+set -euo pipefail
+umask 077
+cd /data/workspace
+printf 'Sunfish OpenCode trial: HA tools are read-only. This is not an HA configuration workspace.\n'
+printf 'Big Pickle is a remote free model; its free-period data may be used to improve the model.\n'
+printf 'Do not submit private household data unless you have approved that disclosure.\n'
+printf 'Application permissions are not an operating-system sandbox. No login or prompt has been started.\n'
+exec /usr/local/bin/opencode --pure --model opencode/big-pickle --agent sunfish_readonly
