@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- Use explicit Alpine executable paths while retaining the cleaned child environment.
+- Distinguish missing executables, process startup errors and timeouts without revealing exception details.
+
 ## 0.1.1
 
 - Report fixed, non-sensitive startup diagnostic categories without logging subprocess stderr.

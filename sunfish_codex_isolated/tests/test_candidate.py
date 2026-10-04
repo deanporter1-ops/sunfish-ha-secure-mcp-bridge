@@ -61,10 +61,26 @@ class ReadinessTests(unittest.TestCase):
 
     def test_native_sandbox_and_user_namespace_are_unprivileged(self):
         command = sandbox_command()
-        self.assertEqual(command[:4], ["su-exec", "codex:codex", "/usr/local/bin/codex", "sandbox"])
+        self.assertEqual(command[:4], ["/sbin/su-exec", "codex:codex", "/usr/local/bin/codex", "sandbox"])
         self.assertIn('sandbox_mode="workspace-write"', command)
         self.assertNotIn("linux", command)
-        self.assertEqual(userns_command()[:3], ["su-exec", "codex:codex", "/usr/local/bin/bwrap"])
+        self.assertEqual(userns_command()[:3], ["/sbin/su-exec", "codex:codex", "/usr/local/bin/bwrap"])
+
+    def test_process_start_errors_use_fixed_diagnostics(self):
+        import subprocess
+        cases = [
+            (FileNotFoundError("private-secret"), "EXECUTABLE_NOT_FOUND"),
+            (subprocess.TimeoutExpired("private-secret", 20), "PROCESS_TIMEOUT"),
+            (OSError("private-secret"), "PROCESS_START_FAILED"),
+        ]
+        for error, category in cases:
+            with self.subTest(category=category):
+                def fail(*_a, **_k):
+                    raise error
+                with patch("builtins.print") as output, self.assertRaises(ReadinessError):
+                    run_check("test", ["ignored"], {}, runner=fail)
+                self.assertEqual(output.call_args.args[0], "Readiness failure category: " + category)
+                self.assertNotIn("private-secret", str(output.call_args_list))
         self.assertIn("--unshare-user", userns_command())
 
     def test_readiness_is_bounded_and_fail_closed(self):

@@ -1,5 +1,5 @@
 name: Sunfish Codex Isolated
-version: "0.1.1"
+version: "0.1.2"
 stage: experimental
 slug: sunfish_codex_isolated
 description: Isolated Codex workspace with ingress-only terminal and read-only HA MCP relay.

@@ -57,7 +57,7 @@ def main():
         "CODEX_HOME": "/data/home/.codex", "USER": "codex", "LOGNAME": "codex",
         "TERM": "xterm-256color", "LANG": "C.UTF-8", "HISTFILE": "/dev/null",
     }
-    run_check("ingress configuration", ["nginx", "-t", "-c", str(nginx_path)], environment)
+    run_check("ingress configuration", ["/usr/sbin/nginx", "-t", "-c", str(nginx_path)], environment)
     run_readiness(environment)
     print("Readiness ingress owner-ID gate: configured (identity not logged)", flush=True)
     relay = None
@@ -65,8 +65,8 @@ def main():
         relay = make_server(options["mcp_url"])
         threading.Thread(target=relay.serve_forever, daemon=True).start()
     children = [
-        subprocess.Popen(["nginx", "-c", str(nginx_path), "-g", "daemon off;"]),
-        subprocess.Popen(["su-exec", "codex:codex", "ttyd", "--interface", "127.0.0.1",
+        subprocess.Popen(["/usr/sbin/nginx", "-c", str(nginx_path), "-g", "daemon off;"]),
+        subprocess.Popen(["/sbin/su-exec", "codex:codex", "/usr/bin/ttyd", "--interface", "127.0.0.1",
                           "--port", "7681", "--writable", "--max-clients", "1",
                           "--check-origin", "/usr/local/bin/codex-session"], env=environment),
     ]

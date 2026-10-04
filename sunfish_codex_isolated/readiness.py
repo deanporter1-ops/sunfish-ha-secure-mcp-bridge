@@ -68,13 +68,13 @@ def probe(sandbox=False):
 
 def sandbox_command():
     # 0.160.0 uses the host-native `codex sandbox`, not `sandbox linux`.
-    return ["su-exec", "codex:codex", "/usr/local/bin/codex", "sandbox",
+    return ["/sbin/su-exec", "codex:codex", "/usr/local/bin/codex", "sandbox",
             "--config", 'sandbox_mode="workspace-write"', "--",
             "/usr/bin/python3", "/opt/sunfish/readiness.py", "--sandbox-probe"]
 
 
 def userns_command():
-    return ["su-exec", "codex:codex", "/usr/local/bin/bwrap",
+    return ["/sbin/su-exec", "codex:codex", "/usr/local/bin/bwrap",
             "--unshare-user", "--uid", "1000", "--gid", "1000",
             "--ro-bind", "/", "/", "--proc", "/proc", "--dev", "/dev",
             "--die-with-parent", "--", "/bin/true"]
@@ -82,6 +82,7 @@ def userns_command():
 
 def run_check(label, command, environment, runner=subprocess.run, version=False):
     result = None
+    exception_category = None
     try:
         result = runner(command, env=environment, cwd="/data/workspace",
                         stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
@@ -89,14 +90,23 @@ def run_check(label, command, environment, runner=subprocess.run, version=False)
         ok = result.returncode == 0
         if version:
             ok = ok and result.stdout.decode("utf-8", "replace").strip() == VERSION
-    except (OSError, subprocess.TimeoutExpired):
+    except FileNotFoundError:
+        exception_category = "EXECUTABLE_NOT_FOUND"
+        ok = False
+    except subprocess.TimeoutExpired:
+        exception_category = "PROCESS_TIMEOUT"
+        ok = False
+    except OSError:
+        exception_category = "PROCESS_START_FAILED"
         ok = False
     # Fixed labels only: never echo stderr, commands, config, URLs, or user IDs.
     print("Readiness " + label + (": PASS" if ok else ": FAIL"), flush=True)
     if not ok:
         # Emit only fixed diagnostic categories, never raw process output.
         raw_error = getattr(result, "stderr", b"") or b""
-        if b"Operation not permitted" in raw_error:
+        if exception_category:
+            print("Readiness failure category: " + exception_category, flush=True)
+        elif b"Operation not permitted" in raw_error:
             print("Readiness failure category: OPERATION_NOT_PERMITTED", flush=True)
         elif b"Permission denied" in raw_error:
             print("Readiness failure category: PERMISSION_DENIED", flush=True)
@@ -121,9 +131,9 @@ def run_readiness(environment):
     clean = dict(environment)
     # A separate empty home prevents the probe using persisted ChatGPT auth or MCP.
     clean["CODEX_HOME"] = "/run/codex-readiness"
-    run_check("pinned Codex version", ["su-exec", "codex:codex",
+    run_check("pinned Codex version", ["/sbin/su-exec", "codex:codex",
               "/usr/local/bin/codex", "--version"], clean, version=True)
-    run_check("UID and no-HA-mount boundary", ["su-exec", "codex:codex",
+    run_check("UID and no-HA-mount boundary", ["/sbin/su-exec", "codex:codex",
               "/usr/bin/python3", "/opt/sunfish/readiness.py", "--probe"], clean)
     run_check("unprivileged bwrap user namespace", userns_command(), clean)
     run_check("Codex workspace sandbox", sandbox_command(), clean)
